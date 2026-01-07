@@ -4,7 +4,7 @@ services:
     ports:
       - '3000:3000'
     env_file:
-      - ./Api-gateway-service/.env_file
+      - ./Api-gateway-service/.env
     depends_on:
       redis:
         condition: service_started
@@ -19,7 +19,7 @@ services:
     ports:
       - '3001:3001'
     env_file:
-      - ./Identity-service/.env_file
+      - ./Identity-service/.env
     depends_on:
       redis:
         condition: service_started
@@ -34,7 +34,7 @@ services:
     ports:
       - '3002:3002'
     env_file:
-      - ./Post-Service/.env_file
+      - ./Post-Service/.env
     depends_on:
       redis:
         condition: service_started
@@ -49,7 +49,7 @@ services:
     ports:
       - '3003:3003'
     env_file:
-      - ./Media-Service/.env_file
+      - ./Media-Service/.env
     depends_on:
       redis:
         condition: service_started
@@ -64,7 +64,7 @@ services:
     ports:
       - '3004:3004'
     env_file:
-      - ./Search-Service/.env_file
+      - ./Search-Service/.env
     depends_on:
       redis:
         condition: service_started
