@@ -1,0 +1,91 @@
+services:
+  api-gateway:
+    build: ./Api-gateway-service
+    ports:
+      - '3000:3000'
+    env_file:
+      - ./Api-gateway-service/.env_file
+    depends_on:
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://rabbitmq:5672
+
+  identity-service:
+    build: ./Identity-service
+    ports:
+      - '3001:3001'
+    env_file:
+      - ./Identity-service/.env_file
+    depends_on:
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://rabbitmq:5672
+
+  post-service:
+    build: ./Post-Service
+    ports:
+      - '3002:3002'
+    env_file:
+      - ./Post-Service/.env_file
+    depends_on:
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://rabbitmq:5672
+
+  media-service:
+    build: ./Media-Service
+    ports:
+      - '3003:3003'
+    env_file:
+      - ./Media-Service/.env_file
+    depends_on:
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://rabbitmq:5672
+
+  search-service:
+    build: ./Search-Service
+    ports:
+      - '3004:3004'
+    env_file:
+      - ./Search-Service/.env_file
+    depends_on:
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://redis:6379
+      RABBITMQ_URL: amqp://rabbitmq:5672
+
+  redis:
+    image: redis:alpine
+    ports:
+      - '6379:6379'
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      interval: 30s
+      timeout: 10s
+      retries: 5
