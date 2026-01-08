@@ -1,0 +1,178 @@
+Microservice App with n8n Automation
+
+A full-featured microservice application with Post, Media, Search, Identity services, integrated with RabbitMQ for event-driven communication and n8n for automation workflows.
+
+Table of Contents
+
+Project Overview
+
+Architecture
+
+Features
+
+Folder Structure
+
+Environment Variables
+
+Docker Setup
+
+Services
+
+n8n Automation Workflow
+
+Testing
+
+License
+
+Project Overview
+
+This project demonstrates a microservices-based architecture with:
+
+Event-driven communication using RabbitMQ
+
+Redis for caching and rate-limiting
+
+n8n automation for orchestrating Post and Media events
+
+REST APIs for Identity, Post, Media, and Search functionality
+
+API Gateway for request routing and authentication
+
+The system is containerized using Docker and orchestrated with Docker Compose.
+
+Architecture
+Client --> API Gateway --> Microservices
+├── Identity Service
+├── Post Service
+├── Media Service
+└── Search Service
+
+RabbitMQ (Event Bus) <---> n8n-Bridge <---> n8n Automation
+
+Redis (Caching & Rate Limiting)
+
+Microservices communicate asynchronously via RabbitMQ events (post.created, post.deleted).
+
+n8n workflows automate tasks like media cleanup, notifications, and logging.
+
+API Gateway handles authentication, rate-limiting, and routing requests.
+
+Features
+
+User Authentication: Sign up, login, JWT token validation.
+
+Post Service: Create, read, delete posts.
+
+Media Service: Upload, list, and delete media files.
+
+Search Service: Maintain search indexes for posts.
+
+Event-Driven Automation: n8n workflows triggered by RabbitMQ events.
+
+Caching & Rate Limiting: Redis-based caching and DDoS prevention.
+
+Containerized: Each service runs in its own Docker container.
+
+Folder Structure
+MICROSERVICE-CHAT-APP/
+│
+├─ Api-gateway-service/
+├─ Identity-service/
+├─ Post-Service/
+├─ Media-Service/
+├─ Search-Service/
+├─ n8n/
+│ └─ .env
+├─ n8n-bridge-service/
+│ └─ index.js
+│ └─ .env
+└─ docker-compose.yml
+
+Environment Variables
+Example .env for Services:
+PORT=3000
+REDIS_URL=redis://redis:6379
+RABBITMQ_URL=amqp://rabbitmq:5672
+
+n8n/.env
+N8N_BASIC_AUTH_ACTIVE=true
+N8N_BASIC_AUTH_USER=admin
+N8N_BASIC_AUTH_PASSWORD=adminpassword
+N8N_HOST=0.0.0.0
+N8N_PORT=5678
+WEBHOOK_URL=http://localhost:5678/
+
+n8n-bridge-service/.env
+RABBITMQ_URL=amqp://rabbitmq:5672
+N8N_WEBHOOK_BASE_URL=http://n8n:5678/
+
+Docker Setup
+
+Ensure Docker and Docker Compose v2+ are installed:
+
+docker compose version
+
+Start all services:
+
+docker compose up -d
+
+Verify running containers:
+
+docker compose ps
+
+Services
+Service Port Description
+API Gateway 3000 Routes requests to microservices
+Identity Service 3001 Handles user authentication
+Post Service 3002 Manage posts
+Media Service 3003 Media upload, deletion
+Search Service 3004 Maintain post search index
+Redis 6379 Caching and rate limiting
+RabbitMQ 5672 Event-driven messaging
+RabbitMQ Management 15672 RabbitMQ web management UI
+n8n 5678 Automation workflow orchestrator
+n8n-bridge-service N/A Bridges RabbitMQ events to n8n
+n8n Automation Workflow
+
+Workflow Name: Post & Media Automation
+
+Triggers: RabbitMQ events forwarded by n8n-bridge
+
+Workflow Nodes:
+
+Post Created Webhook → Logs post creation
+
+Post Deleted Webhook → Logs deletion
+
+Delete Media via Media Service → Calls Media Service to delete associated media
+
+Webhook URLs in n8n must match RabbitMQ routing keys:
+
+Event Key n8n Webhook Path
+post.created /post.created
+post.deleted /post.deleted
+Testing the System
+
+Create a post via Post Service API:
+
+POST http://localhost:3000/v1/posts
+{
+"content": "Hello world",
+"mediaIds": []
+}
+
+Check n8n workflow log → Post Created Webhook should log event.
+
+Delete the post:
+
+DELETE http://localhost:3000/v1/posts/:id
+
+n8n will trigger Post Deleted Webhook → Media Service deletes media automatically.
+
+RabbitMQ management UI: http://localhost:15672 (default guest:guest)
+
+n8n UI: http://localhost:5678 (login with admin/adminpassword)
+
+License
+
+This project is MIT licensed.
